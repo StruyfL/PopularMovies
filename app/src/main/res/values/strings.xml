@@ -1,0 +1,19 @@
+<resources>
+    <string name="app_name">PopularMovies</string>
+
+    <string name="content_description">Movie Poster</string>
+    <string name="settings_string">Settings</string>
+    <string name="sortorder_key">pref_sort</string>
+    <string name="sort_order">Sort Order</string>
+    <string name="sort_default">popular</string>
+
+    <!-- Strings for details screen -->
+    <string name="details_title">Title</string>
+    <string name="details_releasedate">Release Date</string>
+    <string name="details_rating">Rating</string>
+    <string name="details_synopsis">Synopsis</string>
+    <string name="details_runtime">Runtime</string>
+
+    <string name="runtime_string">%1$d min</string>
+
+</resources>
