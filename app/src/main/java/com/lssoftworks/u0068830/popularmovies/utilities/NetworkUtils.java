@@ -3,6 +3,8 @@ package com.lssoftworks.u0068830.popularmovies.utilities;
 import android.net.Uri;
 import android.util.Log;
 
+import com.lssoftworks.u0068830.popularmovies.BuildConfig;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
@@ -23,7 +25,7 @@ public class NetworkUtils {
     private static final String SIZE_PARAM = "w185/";
     private static final String API_KEY = "api_key";
     // Don't forget to add your own API key if you want to contact the Movie Database!!!
-    private static final String API_KEY_VALUE = "8a2531a32865958e464858f0c902327d";
+    private static final String API_KEY_VALUE = BuildConfig.API_KEY;
 
 
     public static URL buildUrl(String sortType) {

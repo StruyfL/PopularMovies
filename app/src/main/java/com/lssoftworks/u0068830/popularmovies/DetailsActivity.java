@@ -24,7 +24,6 @@ public class DetailsActivity extends AppCompatActivity {
     TextView mRating;
     TextView mRuntime;
     ImageView mDetailsPoster;
-    int orientation = ORIENTATION_PORTRAIT;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
