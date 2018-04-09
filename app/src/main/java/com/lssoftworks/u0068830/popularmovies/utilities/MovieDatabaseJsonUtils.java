@@ -8,6 +8,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.net.HttpURLConnection;
+import java.util.ArrayList;
 
 /**
  * Created by u0068830 on 13/03/2018.
@@ -15,15 +16,26 @@ import java.net.HttpURLConnection;
 
 public class MovieDatabaseJsonUtils {
 
-    final static String MDB_RESULT = "results";
-    final static String MDB_POSTER_PATH = "poster_path";
-    final static String MDB_ID = "id";
-    final static String MDB_TITLE = "original_title";
-    final static String MDB_OVERVIEW = "overview";
-    final static String MDB_RELEASE_DATE = "release_date";
-    final static String MDB_USER_RATING = "vote_average";
-    final static String MDB_RUNTIME = "runtime";
-    //final static String
+    private final static String MDB_RESULT = "results";
+
+    // Constants for movie information
+    private final static String MDB_POSTER_PATH = "poster_path";
+    private final static String MDB_ID = "id";
+    private final static String MDB_TITLE = "original_title";
+    private final static String MDB_OVERVIEW = "overview";
+    private final static String MDB_RELEASE_DATE = "release_date";
+    private final static String MDB_USER_RATING = "vote_average";
+    private final static String MDB_RUNTIME = "runtime";
+
+    // Constants for review information
+    private final static String MDB_AUTHOR = "author";
+    private final static String MDB_CONTENT = "content";
+
+    // Constants for video information
+    private final static String MDB_TYPE = "type";
+    private final static String MDB_NAME = "name";
+    private final static String MDB_SITE = "site";
+    private static final String MDB_KEY = "key";
 
     public static MovieData[] getAllMovieData (Context context, String movieJsonStr) throws JSONException {
 
@@ -50,7 +62,7 @@ public class MovieDatabaseJsonUtils {
         MovieData[] movieData = new MovieData[movieArray.length()];
 
         for(int i = 0; i < movieArray.length(); i++) {
-            movieData[i] = new MovieData();
+            movieData[i] = new MovieData(0);
             JSONObject movieObject = movieArray.getJSONObject(i);
 
             movieData[i].setId(movieObject.getInt(MDB_ID));
@@ -60,11 +72,14 @@ public class MovieDatabaseJsonUtils {
         return movieData;
     }
 
-    public static MovieData getMovieData (Context context, String movieJsonStr) throws JSONException {
+    public static MovieData getMovieData (Context context, String movieJsonStr, String movieVideosJsonString,
+                                          String movieReviewsJsonString) throws JSONException {
 
         final String MDB_MESSAGE_CODE = "cod";
 
         JSONObject movieJson = new JSONObject(movieJsonStr);
+        JSONObject movieVideoJson = new JSONObject(movieVideosJsonString);
+        JSONObject movieReviewJson = new JSONObject(movieReviewsJsonString);
 
         if (movieJson.has(MDB_MESSAGE_CODE)) {
             int errorCode = movieJson.getInt(MDB_MESSAGE_CODE);
@@ -88,7 +103,24 @@ public class MovieDatabaseJsonUtils {
         double rating = movieJson.getDouble(MDB_USER_RATING);
         String releaseDate = movieJson.getString(MDB_RELEASE_DATE);
         int runtime = movieJson.getInt(MDB_RUNTIME);
-        MovieData movieData = new MovieData();
+        JSONArray movieReviews = movieReviewJson.getJSONArray(MDB_RESULT);
+        JSONArray movieTrailers = movieVideoJson.getJSONArray(MDB_RESULT);
+        int trailerCount = 0;
+        int reviewCount = 0;
+        ArrayList<String> trailerUrls = new ArrayList<>();
+        String[] trailerUrlsArray;
+
+        for(int i = 0; i < movieTrailers.length(); i++) {
+            JSONObject movieTrailer = movieTrailers.getJSONObject(i);
+            if(movieTrailer.getString(MDB_TYPE).equals("Trailer")) {
+                trailerCount++;
+                trailerUrls.add("http://www.youtube.com/watch?v=" + movieTrailer.getString(MDB_KEY));
+            }
+        }
+
+        trailerUrlsArray = new String[trailerCount];
+
+        MovieData movieData = new MovieData(trailerCount);
 
         movieData.setId(id);
         movieData.setOriginalTitle(movieTitle);
@@ -97,6 +129,8 @@ public class MovieDatabaseJsonUtils {
         movieData.setVoteAverage(rating);
         movieData.setReleaseDate(releaseDate);
         movieData.setRuntime(runtime);
+        movieData.setTrailers(trailerUrls.toArray(trailerUrlsArray));
+
 
         return movieData;
     }

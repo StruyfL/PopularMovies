@@ -11,6 +11,49 @@ public class MovieData {
     private String overview;
     private double voteAverage;
     private String releaseDate;
+    private int runtime;
+    private int trailerCount;
+    private String[] trailers;
+    private int reviewCount;
+    private String[] reviews;
+
+
+    public MovieData(int trailerCount) {
+        trailers = new String[trailerCount];
+        this.trailerCount = trailerCount;
+    }
+
+    public int getTrailerCount() {
+        return trailerCount;
+    }
+
+    public void setTrailerCount(int trailerCount) {
+        this.trailerCount = trailerCount;
+    }
+
+    public String[] getTrailers() {
+        return trailers;
+    }
+
+    public void setTrailers(String[] trailers) {
+        this.trailers = trailers;
+    }
+
+    public int getReviewCount() {
+        return reviewCount;
+    }
+
+    public void setReviewCount(int reviewCount) {
+        this.reviewCount = reviewCount;
+    }
+
+    public String[] getReviews() {
+        return reviews;
+    }
+
+    public void setReviews(String[] reviews) {
+        this.reviews = reviews;
+    }
 
     public int getRuntime() {
         return runtime;
@@ -18,12 +61,6 @@ public class MovieData {
 
     public void setRuntime(int runtime) {
         this.runtime = runtime;
-    }
-
-    private int runtime;
-
-    public MovieData() {
-
     }
 
     public String getOriginalTitle() {

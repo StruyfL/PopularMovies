@@ -1,10 +1,17 @@
 package com.lssoftworks.u0068830.popularmovies;
 
 import android.content.Intent;
+import android.net.Uri;
 import android.os.AsyncTask;
+import android.support.constraint.ConstraintLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.telecom.Call;
+import android.util.Log;
+import android.view.View;
+import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.lssoftworks.u0068830.popularmovies.utilities.MovieData;
@@ -14,7 +21,6 @@ import com.squareup.picasso.Picasso;
 
 import java.net.URL;
 
-import static android.content.res.Configuration.ORIENTATION_PORTRAIT;
 
 public class DetailsActivity extends AppCompatActivity {
 
@@ -24,6 +30,7 @@ public class DetailsActivity extends AppCompatActivity {
     TextView mRating;
     TextView mRuntime;
     ImageView mDetailsPoster;
+    LinearLayout mDetailsLayout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,8 +43,9 @@ public class DetailsActivity extends AppCompatActivity {
         mRuntime = findViewById(R.id.tv_runtime);
         mOverview = findViewById(R.id.tv_synopsis);
         mDetailsPoster = findViewById(R.id.iv_detailsposter);
+        mDetailsLayout = findViewById(R.id.ll_trailers);
 
-        String id = "";
+        String id;
         Intent mainIntent = getIntent();
 
         if (mainIntent.hasExtra(Intent.EXTRA_TEXT)) {
@@ -63,11 +71,17 @@ public class DetailsActivity extends AppCompatActivity {
 
             String id = strings[0];
             URL movieTypeRequestUrl = NetworkUtils.buildMovieUrl(id);
+            URL movieVideosRequestUrl = NetworkUtils.buildMovieEndPointUrl(id, NetworkUtils.VIDEOS_ENDPOINT);
+            URL movieReviewsRequestUrl = NetworkUtils.buildMovieEndPointUrl(id, NetworkUtils.REVIEWS_ENDPOINT);
 
             try {
                 String jsonMovieResponse = NetworkUtils.getResponseFromHttpUrl(movieTypeRequestUrl);
+                String jsonMovieVideosResponse = NetworkUtils.getResponseFromHttpUrl(movieVideosRequestUrl);
+                String jsonMovieReviewsResponse = NetworkUtils.getResponseFromHttpUrl(movieReviewsRequestUrl);
 
-                MovieData movieData = MovieDatabaseJsonUtils.getMovieData(DetailsActivity.this, jsonMovieResponse);
+                MovieData movieData = MovieDatabaseJsonUtils.getMovieData(DetailsActivity.this, jsonMovieResponse,
+                        jsonMovieVideosResponse, jsonMovieReviewsResponse);
+
                 return movieData;
 
             } catch (Exception e) {
@@ -88,7 +102,28 @@ public class DetailsActivity extends AppCompatActivity {
 
                 String runtime = getString(R.string.runtime_string, movieData.getRuntime());
                 mRuntime.setText(runtime);
+
+                String[] trailerUrls = movieData.getTrailers();
+                int trailerCount = movieData.getTrailerCount();
+
+                for(int i = 0; i < trailerCount; i++) {
+                    Button trailerButton = (Button) getLayoutInflater().inflate(R.layout.trailer_button, null);
+                    trailerButton.setText(getString(R.string.trailer_string, i+1));
+                    trailerButton.setTag(trailerUrls[i]);
+                    mDetailsLayout.addView(trailerButton);
+                }
             }
+        }
+    }
+
+    public void startTrailer(View view) {
+        String url = view.getTag().toString();
+        Uri webpage = Uri.parse(url);
+
+        Intent intent = new Intent(Intent.ACTION_VIEW, webpage);
+
+        if(intent.resolveActivity(getPackageManager()) != null) {
+            startActivity(intent);
         }
     }
 }

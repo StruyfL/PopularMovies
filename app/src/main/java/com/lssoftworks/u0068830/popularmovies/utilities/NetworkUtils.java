@@ -23,6 +23,8 @@ public class NetworkUtils {
     private static final String MOVIE_POSTER_BASE_URL = "http://image.tmdb.org/t/p/";
     private static final String MOVIES_BASE_URL = "https://api.themoviedb.org/3/movie/";
     private static final String SIZE_PARAM = "w185/";
+    public static final String VIDEOS_ENDPOINT = "videos";
+    public static final String REVIEWS_ENDPOINT = "reviews";
     private static final String API_KEY = "api_key";
     // Don't forget to add your own API key if you want to contact the Movie Database!!!
     private static final String API_KEY_VALUE = BuildConfig.API_KEY;
@@ -64,6 +66,23 @@ public class NetworkUtils {
 
     public static URL buildMovieUrl(String id) {
         Uri builtUri = Uri.parse(MOVIES_BASE_URL + id).buildUpon()
+                .appendQueryParameter(API_KEY, API_KEY_VALUE)
+                .build();
+
+        URL url = null;
+        try {
+            url = new URL(builtUri.toString());
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        }
+
+        Log.v(TAG, "Built URI " + url);
+
+        return url;
+    }
+
+    public static URL buildMovieEndPointUrl(String id, String endPoint) {
+        Uri builtUri = Uri.parse(MOVIES_BASE_URL + id + "/" + endPoint).buildUpon()
                 .appendQueryParameter(API_KEY, API_KEY_VALUE)
                 .build();
 
