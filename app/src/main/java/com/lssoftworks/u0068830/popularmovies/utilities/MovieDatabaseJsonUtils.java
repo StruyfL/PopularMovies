@@ -62,7 +62,7 @@ public class MovieDatabaseJsonUtils {
         MovieData[] movieData = new MovieData[movieArray.length()];
 
         for(int i = 0; i < movieArray.length(); i++) {
-            movieData[i] = new MovieData(0);
+            movieData[i] = new MovieData(0, 0);
             JSONObject movieObject = movieArray.getJSONObject(i);
 
             movieData[i].setId(movieObject.getInt(MDB_ID));
@@ -106,7 +106,7 @@ public class MovieDatabaseJsonUtils {
         JSONArray movieReviews = movieReviewJson.getJSONArray(MDB_RESULT);
         JSONArray movieTrailers = movieVideoJson.getJSONArray(MDB_RESULT);
         int trailerCount = 0;
-        int reviewCount = 0;
+        int reviewCount;
         ArrayList<String> trailerUrls = new ArrayList<>();
         String[] trailerUrlsArray;
 
@@ -120,7 +120,17 @@ public class MovieDatabaseJsonUtils {
 
         trailerUrlsArray = new String[trailerCount];
 
-        MovieData movieData = new MovieData(trailerCount);
+        reviewCount = movieReviews.length();
+        String[] authors = new String[reviewCount];
+        String[] content = new String[reviewCount];
+
+        for(int i = 0; i < movieReviews.length();i++) {
+            JSONObject movieReview = movieReviews.getJSONObject(i);
+            authors[i] = movieReview.getString(MDB_AUTHOR);
+            content[i] = movieReview.getString(MDB_CONTENT);
+        }
+
+        MovieData movieData = new MovieData(trailerCount, reviewCount);
 
         movieData.setId(id);
         movieData.setOriginalTitle(movieTitle);
@@ -130,7 +140,7 @@ public class MovieDatabaseJsonUtils {
         movieData.setReleaseDate(releaseDate);
         movieData.setRuntime(runtime);
         movieData.setTrailers(trailerUrls.toArray(trailerUrlsArray));
-
+        movieData.setReviews(authors, content);
 
         return movieData;
     }

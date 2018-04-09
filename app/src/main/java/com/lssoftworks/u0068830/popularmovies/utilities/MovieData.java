@@ -15,12 +15,14 @@ public class MovieData {
     private int trailerCount;
     private String[] trailers;
     private int reviewCount;
-    private String[] reviews;
+    private String[] reviewAuthors;
+    private String[] reviewContent;
 
 
-    public MovieData(int trailerCount) {
+    public MovieData(int trailerCount, int reviewCount) {
         trailers = new String[trailerCount];
         this.trailerCount = trailerCount;
+        this.reviewCount = reviewCount;
     }
 
     public int getTrailerCount() {
@@ -47,12 +49,17 @@ public class MovieData {
         this.reviewCount = reviewCount;
     }
 
-    public String[] getReviews() {
-        return reviews;
+    public String[] getReviewAuthors() {
+        return reviewAuthors;
     }
 
-    public void setReviews(String[] reviews) {
-        this.reviews = reviews;
+    public String[] getReviewContent() {
+        return reviewContent;
+    }
+
+    public void setReviews(String[] reviewAuthors, String[] reviewContent) {
+        this.reviewAuthors = reviewAuthors;
+        this.reviewContent = reviewContent;
     }
 
     public int getRuntime() {

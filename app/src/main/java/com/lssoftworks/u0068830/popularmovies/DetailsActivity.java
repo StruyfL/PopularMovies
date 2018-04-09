@@ -9,6 +9,7 @@ import android.os.Bundle;
 import android.telecom.Call;
 import android.util.Log;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -18,6 +19,8 @@ import com.lssoftworks.u0068830.popularmovies.utilities.MovieData;
 import com.lssoftworks.u0068830.popularmovies.utilities.MovieDatabaseJsonUtils;
 import com.lssoftworks.u0068830.popularmovies.utilities.NetworkUtils;
 import com.squareup.picasso.Picasso;
+
+import org.w3c.dom.Text;
 
 import java.net.URL;
 
@@ -31,6 +34,7 @@ public class DetailsActivity extends AppCompatActivity {
     TextView mRuntime;
     ImageView mDetailsPoster;
     LinearLayout mDetailsLayout;
+    LinearLayout mReviewLayout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,6 +48,7 @@ public class DetailsActivity extends AppCompatActivity {
         mOverview = findViewById(R.id.tv_synopsis);
         mDetailsPoster = findViewById(R.id.iv_detailsposter);
         mDetailsLayout = findViewById(R.id.ll_trailers);
+        mReviewLayout = findViewById(R.id.ll_reviews);
 
         String id;
         Intent mainIntent = getIntent();
@@ -79,10 +84,8 @@ public class DetailsActivity extends AppCompatActivity {
                 String jsonMovieVideosResponse = NetworkUtils.getResponseFromHttpUrl(movieVideosRequestUrl);
                 String jsonMovieReviewsResponse = NetworkUtils.getResponseFromHttpUrl(movieReviewsRequestUrl);
 
-                MovieData movieData = MovieDatabaseJsonUtils.getMovieData(DetailsActivity.this, jsonMovieResponse,
+                return MovieDatabaseJsonUtils.getMovieData(DetailsActivity.this, jsonMovieResponse,
                         jsonMovieVideosResponse, jsonMovieReviewsResponse);
-
-                return movieData;
 
             } catch (Exception e) {
                 e.printStackTrace();
@@ -111,6 +114,19 @@ public class DetailsActivity extends AppCompatActivity {
                     trailerButton.setText(getString(R.string.trailer_string, i+1));
                     trailerButton.setTag(trailerUrls[i]);
                     mDetailsLayout.addView(trailerButton);
+                }
+
+                String[] reviewAuthors = movieData.getReviewAuthors();
+                String[] reviewContent = movieData.getReviewContent();
+                int reviewCount = movieData.getReviewCount();
+
+                for(int i = 0; i < reviewCount; i++) {
+                    ConstraintLayout reviewLayout = (ConstraintLayout) getLayoutInflater().inflate(R.layout.review_pane, null);
+                    TextView authorView = (TextView) reviewLayout.getChildAt(0);
+                    authorView.setText(reviewAuthors[i]);
+                    TextView contentView = (TextView) reviewLayout.getChildAt(1);
+                    contentView.setText(reviewContent[i]);
+                    mReviewLayout.addView(reviewLayout);
                 }
             }
         }
