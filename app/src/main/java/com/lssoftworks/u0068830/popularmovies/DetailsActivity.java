@@ -110,7 +110,7 @@ public class DetailsActivity extends AppCompatActivity {
                 int trailerCount = movieData.getTrailerCount();
 
                 for(int i = 0; i < trailerCount; i++) {
-                    Button trailerButton = (Button) getLayoutInflater().inflate(R.layout.trailer_button, null);
+                    Button trailerButton = (Button) getLayoutInflater().inflate(R.layout.trailer_button, mDetailsLayout, false);
                     trailerButton.setText(getString(R.string.trailer_string, i+1));
                     trailerButton.setTag(trailerUrls[i]);
                     mDetailsLayout.addView(trailerButton);
@@ -121,7 +121,7 @@ public class DetailsActivity extends AppCompatActivity {
                 int reviewCount = movieData.getReviewCount();
 
                 for(int i = 0; i < reviewCount; i++) {
-                    ConstraintLayout reviewLayout = (ConstraintLayout) getLayoutInflater().inflate(R.layout.review_pane, null);
+                    ConstraintLayout reviewLayout = (ConstraintLayout) getLayoutInflater().inflate(R.layout.review_pane, mReviewLayout, false);
                     TextView authorView = (TextView) reviewLayout.getChildAt(0);
                     authorView.setText(reviewAuthors[i]);
                     TextView contentView = (TextView) reviewLayout.getChildAt(1);

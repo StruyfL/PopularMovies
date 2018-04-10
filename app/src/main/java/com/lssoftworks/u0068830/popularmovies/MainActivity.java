@@ -140,8 +140,7 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
             try {
                 String jsonMovieResponse = NetworkUtils.getResponseFromHttpUrl(movieTypeRequestUrl);
 
-                MovieData[] movieData = MovieDatabaseJsonUtils.getAllMovieData(MainActivity.this, jsonMovieResponse);
-                return movieData;
+                return MovieDatabaseJsonUtils.getAllMovieData(MainActivity.this, jsonMovieResponse);
 
             } catch (Exception e) {
                 e.printStackTrace();
