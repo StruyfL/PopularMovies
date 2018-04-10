@@ -64,7 +64,7 @@ public class MovieProvider extends ContentProvider {
                 if(id > 0) {
                     returnUri = ContentUris.withAppendedId(MovieContract.Movies.CONTENT_URI, id);
                 } else {
-                    throw new SQLException("Failed t oinsert row into " + uri);
+                    throw new SQLException("Failed to insert row into " + uri);
                 }
                 break;
             default:
