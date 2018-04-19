@@ -3,6 +3,7 @@ package com.lssoftworks.u0068830.popularmovies;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.database.Cursor;
 import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -18,6 +19,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.lssoftworks.u0068830.popularmovies.data.MovieContract;
 import com.lssoftworks.u0068830.popularmovies.utilities.MovieData;
 import com.lssoftworks.u0068830.popularmovies.utilities.MovieDatabaseJsonUtils;
 import com.lssoftworks.u0068830.popularmovies.utilities.NetworkUtils;
@@ -38,6 +40,7 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
     private MovieAdapter mAdapter;
     MovieData[] movieData;
     public static OnViewholderClickListener viewholderClickListener;
+    private static final String TAG = "MainActivity";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -118,34 +121,67 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
         @Override
         protected MovieData[] doInBackground(String... strings) {
 
-            try {
-                Socket sock = new Socket();
-                sock.connect(new InetSocketAddress("8.8.8.8", 53), 1500);
-                sock.close();
+            if (strings[0].equals("popular") || strings[0].equals("top_rated")) {
+                try {
+                    Socket sock = new Socket();
+                    sock.connect(new InetSocketAddress("8.8.8.8", 53), 1500);
+                    sock.close();
 
-                sock.close();
+                    sock.close();
 
-            } catch (IOException e) {
-                publishProgress(0);
-                return null;
+                } catch (IOException e) {
+                    publishProgress(0);
+                    return null;
+                }
+
+                if (strings.length == 0) {
+                    return null;
+                }
+
+                String type = strings[0];
+                URL movieTypeRequestUrl = NetworkUtils.buildUrl(type);
+
+                try {
+                    String jsonMovieResponse = NetworkUtils.getResponseFromHttpUrl(movieTypeRequestUrl);
+
+                    return MovieDatabaseJsonUtils.getAllMovieData(MainActivity.this, jsonMovieResponse);
+
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    return null;
+                }
+
+            } else if (strings[0].equals("favorites")) {
+                try {
+                    Cursor movies = getContentResolver().query(MovieContract.Movies.CONTENT_URI, null, null, null, null);
+                    MovieData[] movieData = new MovieData[movies.getCount()];
+
+                    movies.moveToFirst();
+
+                    for(int i = 0; i < movies.getCount(); i++) {
+                        movieData[i] = new MovieData(0, 0);
+
+                        movieData[i].setId(movies.getInt(movies.getColumnIndex(MovieContract.Movies._ID)));
+                        movieData[i].setOriginalTitle(movies.getString(movies.getColumnIndex(MovieContract.Movies.COLUMN_NAME_TITLE)));
+                        movieData[i].setVoteAverage(movies.getDouble(movies.getColumnIndex(MovieContract.Movies.COLUMN_NAME_RATING)));
+                        movieData[i].setReleaseDate(movies.getString(movies.getColumnIndex(MovieContract.Movies.COLUMN_NAME_RELEASE_DATE)));
+                        movieData[i].setOverview(movies.getString(movies.getColumnIndex(MovieContract.Movies.COLUMN_NAME_SYNOPSIS)));
+
+                        movies.moveToNext();
+                    }
+
+                    movies.close();
+
+                    return movieData;
+
+                } catch (Exception e) {
+                    Log.e(TAG, "Failed to load data from database");
+                    e.printStackTrace();
+                    return null;
+                }
             }
 
-            if (strings.length == 0) {
-                return null;
-            }
-
-            String type = strings[0];
-            URL movieTypeRequestUrl = NetworkUtils.buildUrl(type);
-
-            try {
-                String jsonMovieResponse = NetworkUtils.getResponseFromHttpUrl(movieTypeRequestUrl);
-
-                return MovieDatabaseJsonUtils.getAllMovieData(MainActivity.this, jsonMovieResponse);
-
-            } catch (Exception e) {
-                e.printStackTrace();
-                return null;
-            }
+            return null;
         }
 
         @Override

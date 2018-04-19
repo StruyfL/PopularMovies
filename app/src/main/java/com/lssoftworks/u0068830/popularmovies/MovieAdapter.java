@@ -7,6 +7,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 import com.lssoftworks.u0068830.popularmovies.utilities.MovieData;
 import com.lssoftworks.u0068830.popularmovies.utilities.NetworkUtils;
@@ -20,12 +21,9 @@ import java.net.URL;
 
 public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieViewHolder> {
 
-    private int mNumberItems;
-    private static int viewHolderCount;
     private MovieData[] mMoviePosters;
 
     public MovieAdapter(MovieData[] moviePosters) {
-        viewHolderCount = 0;
         mMoviePosters = moviePosters;
     }
 
@@ -40,8 +38,6 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieViewHol
 
         View view = inflater.inflate(layoutIdForListItem, parent, shouldAttachToParentImmediately);
         MovieViewHolder viewHolder = new MovieViewHolder(view);
-
-        viewHolderCount++;
 
         return viewHolder;
     }
@@ -59,11 +55,13 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieViewHol
 
     class MovieViewHolder extends RecyclerView.ViewHolder {
         ImageView mMoviePoster;
+        TextView mTitle;
 
         public MovieViewHolder (View itemView) {
             super(itemView);
 
             mMoviePoster = itemView.findViewById(R.id.iv_movieposter);
+            mTitle = itemView.findViewById(R.id.tv_title);
             itemView.setOnClickListener(MainActivity.viewholderClickListener);
         }
 
@@ -73,6 +71,8 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieViewHol
 
             Picasso.get().load(url.toString()).into(mMoviePoster);
             mMoviePoster.setTag(mMoviePosters[listIndex].getId());
+
+            mTitle.setText(mMoviePosters[listIndex].getOriginalTitle());
         }
     }
 

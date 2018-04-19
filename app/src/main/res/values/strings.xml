@@ -13,6 +13,7 @@
     <string name="details_rating">Rating</string>
     <string name="details_synopsis">Synopsis</string>
     <string name="details_runtime">Runtime</string>
+    <string name="details_favorite">Add to favorites</string>
 
     <string name="runtime_string">%1$d min</string>
     <string name="trailer_string">Trailer %d</string>

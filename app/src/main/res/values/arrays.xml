@@ -3,10 +3,12 @@
     <array name="sort_order_keys">
         <item>popular</item>
         <item>top_rated</item>
+        <item>favorites</item>
     </array>
 
     <array name="sort_order_values">
         <item>Popular</item>
         <item>Top Rated</item>
+        <item>Favorites</item>
     </array>
 </resources>

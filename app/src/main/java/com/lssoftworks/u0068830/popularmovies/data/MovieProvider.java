@@ -19,13 +19,15 @@ public class MovieProvider extends ContentProvider {
 
     private static final UriMatcher sUriMatcher = buildUriMatcher();
     private MovieDbHelper mMovieDbHelper;
+    private static final int ALL_MOVIES = 1;
+    private static final int MOVIE_ID = 2;
 
     public static UriMatcher buildUriMatcher() {
         UriMatcher uriMatcher = new UriMatcher(UriMatcher.NO_MATCH);
         // Uri for complete movie table
-        uriMatcher.addURI(AUTHORITY, PATH_MOVIES, 1);
+        uriMatcher.addURI(AUTHORITY, PATH_MOVIES, ALL_MOVIES);
         // Uri for one row in movie table
-        uriMatcher.addURI(AUTHORITY, PATH_MOVIES + "/#", 2);
+        uriMatcher.addURI(AUTHORITY, PATH_MOVIES + "/#", MOVIE_ID);
 
         return uriMatcher;
     }
@@ -41,7 +43,25 @@ public class MovieProvider extends ContentProvider {
     @Nullable
     @Override
     public Cursor query(@NonNull Uri uri, @Nullable String[] projection, @Nullable String selection, @Nullable String[] selectionArgs, @Nullable String sortOrder) {
-        return null;
+        final SQLiteDatabase db = mMovieDbHelper.getReadableDatabase();
+
+        int match = sUriMatcher.match(uri);
+        Cursor result;
+
+        switch (match) {
+            case ALL_MOVIES:
+                result = db.query(MovieContract.Movies.TABLE_NAME, projection, null, null, null, null, null);
+                break;
+            case MOVIE_ID:
+                result = db.query(MovieContract.Movies.TABLE_NAME, projection, null, null, null, null, null);
+                break;
+            default:
+                throw new UnsupportedOperationException("Unknown Uri: " + uri);
+        }
+
+        result.setNotificationUri(getContext().getContentResolver(), uri);
+
+        return result;
     }
 
     @Nullable
@@ -56,15 +76,21 @@ public class MovieProvider extends ContentProvider {
         final SQLiteDatabase db = mMovieDbHelper.getWritableDatabase();
 
         int match = sUriMatcher.match(uri);
-        Uri returnUri;
+        Uri returnUri = null;
 
         switch (match) {
-            case 1:
-                long id = db.insert(MovieContract.Movies.TABLE_NAME, null, values);
-                if(id > 0) {
-                    returnUri = ContentUris.withAppendedId(MovieContract.Movies.CONTENT_URI, id);
-                } else {
-                    throw new SQLException("Failed to insert row into " + uri);
+            case ALL_MOVIES:
+                String[] columns = {MovieContract.Movies._ID };
+                String[] ids = { MovieContract.Movies._ID };
+                Cursor movie = query(MovieContract.Movies.CONTENT_URI, columns, "_ID = ?", ids, null);
+
+                if(movie.getCount() == 0) {
+                    long id = db.insert(MovieContract.Movies.TABLE_NAME, null, values);
+                    if (id > 0) {
+                        returnUri = ContentUris.withAppendedId(MovieContract.Movies.CONTENT_URI, id);
+                    } else {
+                        throw new SQLException("Failed to insert row into " + uri);
+                    }
                 }
                 break;
             default:
