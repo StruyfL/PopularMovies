@@ -12,8 +12,6 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Scanner;
 
-import static android.content.ContentValues.TAG;
-
 /**
  * Created by u0068830 on 13/03/2018.
  */
@@ -29,6 +27,7 @@ public class NetworkUtils {
     // Don't forget to add your own API key if you want to contact the Movie Database!!!
     private static final String API_KEY_VALUE = BuildConfig.API_KEY;
 
+    private static final String TAG = "NETWORKUTILS";
 
     public static URL buildUrl(String sortType) {
         Uri builtUri = Uri.parse(MOVIES_BASE_URL + sortType).buildUpon()

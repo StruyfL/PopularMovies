@@ -73,7 +73,6 @@ public class DetailsActivity extends AppCompatActivity {
         if (mainIntent.hasExtra(Intent.EXTRA_TEXT)) {
             id = mainIntent.getStringExtra(Intent.EXTRA_TEXT);
 
-            //Toast.makeText(this, id, Toast.LENGTH_LONG).show();
             new FetchMovieTask().execute(id, sortOrder);
         }
     }
@@ -124,10 +123,8 @@ public class DetailsActivity extends AppCompatActivity {
                 }
             } else if (strings[1].equals("favorites")) {
                 try {
-                    Toast.makeText(DetailsActivity.this, sortOrder, Toast.LENGTH_LONG).show();
-                    String[] columns = {MovieContract.Movies._ID };
                     String[] ids = { strings[0] };
-                    Cursor movie = getContentResolver().query(MovieContract.Movies.CONTENT_URI, columns, "_ID = ?", ids, null);
+                    Cursor movie = getContentResolver().query(MovieContract.Movies.CONTENT_URI, null, "_ID = ?", ids, null);
                     MovieData movieData = new MovieData(0, 0);
 
                     movie.moveToFirst();
@@ -156,7 +153,7 @@ public class DetailsActivity extends AppCompatActivity {
         protected void onPostExecute(MovieData movieData) {
             if (movieData != null) {
                 URL url = NetworkUtils.buildPosterUrl(movieData.getPosterPath());
-                Picasso.get().load(url.toString()).into(mDetailsPoster);
+                Picasso.get().load(url.toString()).placeholder(R.drawable.movieplaceholder).into(mDetailsPoster);
                 mOriginalTitle.setText(movieData.getOriginalTitle());
                 mReleaseDate.setText(movieData.getReleaseDate().substring(0,4));
                 mRating.setText(String.valueOf(movieData.getVoteAverage()));
@@ -164,6 +161,14 @@ public class DetailsActivity extends AppCompatActivity {
 
                 String runtime = getString(R.string.runtime_string, movieData.getRuntime());
                 mRuntime.setText(runtime);
+
+                if(sortOrder.equals("favorites")) {
+                    mRuntime.setVisibility(View.GONE);
+                    mFavorites.setVisibility(View.GONE);
+                } else {
+                    mRuntime.setVisibility(View.VISIBLE);
+                    mFavorites.setVisibility(View.VISIBLE);
+                }
 
                 String[] trailerUrls = movieData.getTrailers();
                 int trailerCount = movieData.getTrailerCount();
