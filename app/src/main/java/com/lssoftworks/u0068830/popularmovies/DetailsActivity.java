@@ -129,7 +129,7 @@ public class DetailsActivity extends AppCompatActivity {
 
                     movie.moveToFirst();
 
-                    movieData.setId(movie.getInt(movie.getColumnIndex(MovieContract.Movies._ID)));
+                    movieData.setId(movie.getInt(movie.getColumnIndex(MovieContract.Movies.COLUMN_NAME_MOVIE_ID)));
                     movieData.setOriginalTitle(movie.getString(movie.getColumnIndex(MovieContract.Movies.COLUMN_NAME_TITLE)));
                     movieData.setVoteAverage(movie.getDouble(movie.getColumnIndex(MovieContract.Movies.COLUMN_NAME_RATING)));
                     movieData.setReleaseDate(movie.getString(movie.getColumnIndex(MovieContract.Movies.COLUMN_NAME_RELEASE_DATE)));
@@ -218,7 +218,7 @@ public class DetailsActivity extends AppCompatActivity {
         ContentValues movieValue = new ContentValues();
 
         if(id.length() != 0) {
-            movieValue.put(MovieContract.Movies._ID, id);
+            movieValue.put(MovieContract.Movies.COLUMN_NAME_MOVIE_ID, id);
             movieValue.put(MovieContract.Movies.COLUMN_NAME_TITLE, mOriginalTitle.getText().toString());
             movieValue.put(MovieContract.Movies.COLUMN_NAME_RATING, mRating.getText().toString());
             movieValue.put(MovieContract.Movies.COLUMN_NAME_RELEASE_DATE, mReleaseDate.getText().toString());

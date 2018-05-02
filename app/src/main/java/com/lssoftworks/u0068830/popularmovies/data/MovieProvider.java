@@ -11,6 +11,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.widget.Toast;
 
 import static com.lssoftworks.u0068830.popularmovies.data.MovieContract.AUTHORITY;
 import static com.lssoftworks.u0068830.popularmovies.data.MovieContract.PATH_MOVIES;
@@ -50,10 +51,10 @@ public class MovieProvider extends ContentProvider {
 
         switch (match) {
             case ALL_MOVIES:
-                result = db.query(MovieContract.Movies.TABLE_NAME, projection, null, null, null, null, null);
+                result = db.query(MovieContract.Movies.TABLE_NAME, projection, selection, selectionArgs, null, null, null);
                 break;
             case MOVIE_ID:
-                result = db.query(MovieContract.Movies.TABLE_NAME, projection, null, null, null, null, null);
+                result = db.query(MovieContract.Movies.TABLE_NAME, projection, selection, selectionArgs, null, null, null);
                 break;
             default:
                 throw new UnsupportedOperationException("Unknown Uri: " + uri);
@@ -80,10 +81,11 @@ public class MovieProvider extends ContentProvider {
 
         switch (match) {
             case ALL_MOVIES:
-                String[] columns = {MovieContract.Movies._ID };
-                String[] ids = { MovieContract.Movies._ID };
-                Cursor movie = query(MovieContract.Movies.CONTENT_URI, columns, "_ID = ?", ids, null);
+                String[] columns = {MovieContract.Movies.COLUMN_NAME_MOVIE_ID };
+                String[] ids = { values.getAsString(MovieContract.Movies.COLUMN_NAME_MOVIE_ID) };
+                Cursor movie = query(MovieContract.Movies.CONTENT_URI, columns, "movieid = ?", ids, null);
 
+                Toast.makeText(getContext(), String.valueOf(movie.getCount()), Toast.LENGTH_LONG).show();
                 if(movie.getCount() == 0) {
                     long id = db.insert(MovieContract.Movies.TABLE_NAME, null, values);
                     if (id > 0) {
@@ -91,6 +93,8 @@ public class MovieProvider extends ContentProvider {
                     } else {
                         throw new SQLException("Failed to insert row into " + uri);
                     }
+                } else {
+                    movie.close();
                 }
                 break;
             default:

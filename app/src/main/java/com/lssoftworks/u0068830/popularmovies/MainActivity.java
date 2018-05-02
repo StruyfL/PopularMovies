@@ -24,6 +24,7 @@ import com.lssoftworks.u0068830.popularmovies.data.MovieContract;
 import com.lssoftworks.u0068830.popularmovies.utilities.MovieData;
 import com.lssoftworks.u0068830.popularmovies.utilities.MovieDatabaseJsonUtils;
 import com.lssoftworks.u0068830.popularmovies.utilities.NetworkUtils;
+import com.squareup.picasso.Picasso;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -32,11 +33,13 @@ import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.net.SocketAddress;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Scanner;
 
 public class MainActivity extends AppCompatActivity implements SharedPreferences.OnSharedPreferenceChangeListener {
 
     private static final int COLUMN_COUNT = 2;
+    private final static String POSTER_ADDRESSES = "poster_addresses";
     private RecyclerView mMoviePosters;
     private MovieAdapter mAdapter;
     MovieData[] movieData;
@@ -49,6 +52,18 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
         setContentView(R.layout.activity_main);
 
         mMoviePosters = findViewById(R.id.rv_movieposters);
+
+        if(savedInstanceState != null) {
+            if(savedInstanceState.containsKey(POSTER_ADDRESSES)) {
+                ArrayList<String> posters = savedInstanceState.getStringArrayList(POSTER_ADDRESSES);
+
+                for (int i = 0; i < posters.size(); i++) {
+                    movieData[i].setPosterPath(posters.get(i));
+                }
+
+                mAdapter.setMovieData(movieData);
+            }
+        }
 
         // Register the onSharedPreferenceChangedListener to the sharedPreferences object.
         // Read sort order preference from SharedPreferences file and execute AsyncTask with that value.
@@ -67,6 +82,7 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
 
         mAdapter = new MovieAdapter(movieData);
         mMoviePosters.setAdapter(mAdapter);
+        mAdapter.setMovieData(movieData);
 
         viewholderClickListener = new OnViewholderClickListener();
     }
@@ -126,8 +142,6 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
                 try {
                     Socket sock = new Socket();
                     sock.connect(new InetSocketAddress("8.8.8.8", 53), 1500);
-                    sock.close();
-
                     sock.close();
 
                 } catch (IOException e) {
@@ -198,6 +212,21 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
 
             Toast.makeText(MainActivity.this, "No internet connection available! Please check your network settings", Toast.LENGTH_LONG).show();
         }
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        ArrayList<String> posters = new ArrayList<>();
+
+        if (movieData != null) {
+            for (int i = 0; i < movieData.length; i++) {
+                posters.add(movieData[i].getPosterPath());
+            }
+
+            outState.putStringArrayList(POSTER_ADDRESSES, posters);
+        }
+
+        super.onSaveInstanceState(outState);
     }
 
     @Override

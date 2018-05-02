@@ -11,6 +11,7 @@ import android.widget.TextView;
 
 import com.lssoftworks.u0068830.popularmovies.utilities.MovieData;
 import com.lssoftworks.u0068830.popularmovies.utilities.NetworkUtils;
+import com.squareup.picasso.NetworkPolicy;
 import com.squareup.picasso.Picasso;
 
 import java.net.URL;
@@ -67,8 +68,8 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieViewHol
 
         void bind(int listIndex) {
             URL url = NetworkUtils.buildPosterUrl(mMoviePosters[listIndex].getPosterPath());
-            //Log.d("MovieAdapter", url.toString());
 
+            Picasso.get().load(url.toString()).fetch();
             Picasso.get().load(url.toString()).into(mMoviePoster);
             mMoviePoster.setTag(mMoviePosters[listIndex].getId());
 

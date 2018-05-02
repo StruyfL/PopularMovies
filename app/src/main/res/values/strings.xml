@@ -3,7 +3,7 @@
 
     <string name="content_description">Movie Poster</string>
     <string name="settings_string">Settings</string>
-    <string name="sortorder_key">pref_sort</string>
+    <string name="sortorder_key" translatable="false">pref_sort</string>
     <string name="sort_order">Sort Order</string>
     <string name="sort_default">popular</string>
 
@@ -15,7 +15,7 @@
     <string name="details_runtime">Runtime</string>
     <string name="details_favorite">Add to favorites</string>
 
-    <string name="runtime_string">%1$d min</string>
-    <string name="trailer_string">Trailer %d</string>
+    <string name="runtime_string" translatable="false">%1$d min</string>
+    <string name="trailer_string" translatable="false">Trailer %d</string>
 
 </resources>
