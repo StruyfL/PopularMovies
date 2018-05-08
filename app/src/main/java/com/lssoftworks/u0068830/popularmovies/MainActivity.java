@@ -42,7 +42,7 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
     private final static String POSTER_ADDRESSES = "poster_addresses";
     private RecyclerView mMoviePosters;
     private MovieAdapter mAdapter;
-    MovieData[] movieData;
+    static MovieData[] movieData;
     public static OnViewholderClickListener viewholderClickListener;
     private static final String TAG = "MainActivity";
 
@@ -53,25 +53,12 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
 
         mMoviePosters = findViewById(R.id.rv_movieposters);
 
-        if(savedInstanceState != null) {
-            if(savedInstanceState.containsKey(POSTER_ADDRESSES)) {
-                ArrayList<String> posters = savedInstanceState.getStringArrayList(POSTER_ADDRESSES);
-
-                for (int i = 0; i < posters.size(); i++) {
-                    movieData[i].setPosterPath(posters.get(i));
-                }
-
-                mAdapter.setMovieData(movieData);
-            }
-        }
-
         // Register the onSharedPreferenceChangedListener to the sharedPreferences object.
         // Read sort order preference from SharedPreferences file and execute AsyncTask with that value.
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         String sortOrder = sharedPreferences.getString(getResources().getString(R.string.sortorder_key), "popular");
         sharedPreferences.registerOnSharedPreferenceChangeListener(this);
 
-        new FetchMoviesTask().execute(sortOrder);
 
         // Create the layout manager for sorting the movie posters in a 2-column grid.
         // Attach the layoutmanager to the RecyclerView.
@@ -80,7 +67,31 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
         mMoviePosters.setLayoutManager(layoutManager);
         mMoviePosters.setHasFixedSize(true);
 
-        mAdapter = new MovieAdapter(movieData);
+        if(savedInstanceState != null) {
+            Log.d("MAINACTIVITY", "Saved Instance State");
+            if(savedInstanceState.containsKey(POSTER_ADDRESSES)) {
+                Log.d("MAINACTIVITY", "Saved Instance State, key present");
+                ArrayList<String> posters = savedInstanceState.getStringArrayList(POSTER_ADDRESSES);
+                movieData = new MovieData[posters.size()];
+
+                for (int i = 0; i < posters.size(); i++) {
+                    movieData[i] = new MovieData(0, 0);
+                    movieData[i].setPosterPath(posters.get(i));
+                }
+
+                mAdapter = new MovieAdapter(movieData);
+            }
+        } else {
+            Log.d("MAINACTIVITY", "NO Saved Instance State");
+            new FetchMoviesTask().execute(sortOrder);
+
+            mAdapter = new MovieAdapter(movieData);
+        }
+
+        if(movieData == null) {
+            Log.d("MAINACTIVITY", "Moviedata is null");
+        }
+
         mMoviePosters.setAdapter(mAdapter);
         mAdapter.setMovieData(movieData);
 
@@ -149,10 +160,6 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
                     return null;
                 }
 
-                if (strings.length == 0) {
-                    return null;
-                }
-
                 String type = strings[0];
                 URL movieTypeRequestUrl = NetworkUtils.buildUrl(type);
 
@@ -202,7 +209,10 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
         @Override
         protected void onPostExecute(MovieData[] movieData) {
             if (movieData != null) {
-                mAdapter.setMovieData(movieData);
+                MainActivity.movieData = new MovieData[movieData.length];
+                MainActivity.movieData = movieData;
+                mAdapter.setMovieData(MainActivity.movieData);
+                Log.d("MAINACTIVITY", "Moviedata is not null in onPostExecute");
             }
         }
 
@@ -217,10 +227,12 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
     @Override
     public void onSaveInstanceState(Bundle outState) {
         ArrayList<String> posters = new ArrayList<>();
-
+        Log.d("MAINACTIVITY", "Moviedata in onSaveInstanceState: " + movieData.toString());
         if (movieData != null) {
+            Log.d("MAINACTIVITY", "Moviedata is not null");
             for (int i = 0; i < movieData.length; i++) {
                 posters.add(movieData[i].getPosterPath());
+                Log.d(POSTER_ADDRESSES, movieData[i].getPosterPath());
             }
 
             outState.putStringArrayList(POSTER_ADDRESSES, posters);
