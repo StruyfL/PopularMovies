@@ -32,6 +32,7 @@ import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.net.URL;
+import java.util.ArrayList;
 
 
 public class DetailsActivity extends AppCompatActivity {
@@ -45,6 +46,15 @@ public class DetailsActivity extends AppCompatActivity {
     ImageView mDetailsPoster;
     LinearLayout mDetailsLayout;
     LinearLayout mReviewLayout;
+    static MovieData movieData;
+
+    final static String M_ID = "m_id";
+    final static String M_TITLE = "m_title";
+    final static String M_POSTERPATH = "m_posterpath";
+    final static String M_RELEASEDATE = "m_releasedate";
+    final static String M_RATING = "m_rating";
+    final static String M_RUNTIME = "m_runtime";
+    final static String M_OVERVIEW = "m_overview";
 
     String id;
     String sortOrder;
@@ -68,13 +78,26 @@ public class DetailsActivity extends AppCompatActivity {
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         sortOrder = sharedPreferences.getString(getResources().getString(R.string.sortorder_key), "popular");
 
-        Intent mainIntent = getIntent();
-
-        if (mainIntent.hasExtra(Intent.EXTRA_TEXT)) {
-            id = mainIntent.getStringExtra(Intent.EXTRA_TEXT);
-
-            new FetchMovieTask().execute(id, sortOrder);
+        if(savedInstanceState != null) {
+            if(savedInstanceState.containsKey(M_ID)) {
+                URL url = NetworkUtils.buildPosterUrl(savedInstanceState.getString(M_POSTERPATH));
+                Picasso.get().load(url.toString()).placeholder(R.drawable.movieplaceholder).into(mDetailsPoster);
+                mOriginalTitle.setText(savedInstanceState.getString(M_TITLE));
+                mReleaseDate.setText(savedInstanceState.getString(M_RELEASEDATE));
+                mRating.setText(String.valueOf(savedInstanceState.getDouble(M_RATING)));
+                mOverview.setText(savedInstanceState.getString(M_OVERVIEW));
+                String runtime = getString(R.string.runtime_string, savedInstanceState.getInt(M_RUNTIME));
+                mRuntime.setText(runtime);
+            }
         }
+
+            Intent mainIntent = getIntent();
+
+            if (mainIntent.hasExtra(Intent.EXTRA_TEXT)) {
+                id = mainIntent.getStringExtra(Intent.EXTRA_TEXT);
+
+                new FetchMovieTask().execute(id, sortOrder);
+            }
     }
 
     public class FetchMovieTask extends AsyncTask<String, Integer, MovieData> {
@@ -152,6 +175,8 @@ public class DetailsActivity extends AppCompatActivity {
         @Override
         protected void onPostExecute(MovieData movieData) {
             if (movieData != null) {
+                DetailsActivity.movieData = new MovieData(0, 0);
+                DetailsActivity.movieData = movieData;
                 URL url = NetworkUtils.buildPosterUrl(movieData.getPosterPath());
                 Picasso.get().load(url.toString()).placeholder(R.drawable.movieplaceholder).into(mDetailsPoster);
                 mOriginalTitle.setText(movieData.getOriginalTitle());
@@ -232,5 +257,18 @@ public class DetailsActivity extends AppCompatActivity {
         } else {
             Toast.makeText(getBaseContext(), "Wrong ID", Toast.LENGTH_LONG).show();
         }
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        outState.putInt(M_ID, movieData.getId());
+        outState.putString(M_TITLE, movieData.getOriginalTitle());
+        outState.putString(M_RELEASEDATE, movieData.getReleaseDate().substring(0,4));
+        outState.putDouble(M_RATING, movieData.getVoteAverage());
+        outState.putInt(M_RUNTIME, movieData.getRuntime());
+        outState.putString(M_OVERVIEW, movieData.getOverview());
+        outState.putString(M_POSTERPATH, movieData.getPosterPath());
+
+        super.onSaveInstanceState(outState);
     }
 }
